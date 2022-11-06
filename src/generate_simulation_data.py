@@ -12,6 +12,7 @@ def main():
                     epilog = 'For more details check D. Carastan-Santos and R. Y. de Camargo, "Obtaining Dynamic Scheduling Policies with Simulation and Machine Learning," SC17: International Conference for High Performance Computing, Networking, Storage and Analysis, 2017, pp. 1-13.')
 
     parser.add_argument('filename', nargs='?', type=str, help='workload file')
+    parser.add_argument('deployment_file', nargs='?', type=str, help='deployment file')
     parser.add_argument('s_size', nargs='?', type=int, help='state set size')
     parser.add_argument('q_size', nargs='?', type=int, help='queue set size')
     parser.add_argument('num_tuples', nargs='?', type=int, help='number of tuples (S,Q)')
@@ -37,13 +38,14 @@ def main():
         exit()
     
     workload_file = args.filename
+    deployment_file = args.deployment_file
     number_of_tuples = args.num_tuples
     number_of_trials = args.num_trials
     state_size = args.s_size
     queue_size = args.q_size
     random_seed = args.seed
 
-    simulator = SchedulingSimulator(workload_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed)
+    simulator = SchedulingSimulator(workload_file, deployment_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed)
     simulator.simulate()
     
 if __name__ == "__main__":

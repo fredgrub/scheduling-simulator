@@ -5,7 +5,7 @@ import numpy as np
 from swf_reader import ReaderSWF
 
 class SchedulingSimulator:
-    def __init__(self, workload_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed):
+    def __init__(self, workload_file, deployment_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed):
         if random_seed != None:
             random.seed(random_seed)
         self.number_of_tuples = number_of_tuples
@@ -18,6 +18,7 @@ class SchedulingSimulator:
         self.number_of_nodes = None
         self.workload_jobs = None
         self.get_workload_info(workload_file)
+        self.deployment_file = deployment_file
 
         self.start_index = None
         self.get_start_index()
@@ -60,8 +61,11 @@ class SchedulingSimulator:
                     
                     current_tuple.write(str(queue_jobs['p'][i])+","+str(queue_jobs['q'][i])+","+str(queue_jobs['r'][i])+"\n")
 
-            subprocess.call(['cp task-sets/set-'+str(tuple_index)+'.csv' ' current-simulation.csv'], shell=True)  
-            subprocess.call(['./trials_simulator simple_cluster.xml deployment_cluster.xml -state > states/set-'+str(tuple_index)+".csv"], shell=True)
+            subprocess.call(['cp task-sets/set-'+str(tuple_index)+'.csv' ' current-simulation.csv'], shell=True)
+
+            # subprocess.call(['./trials_simulator first-model/simple_cluster.xml first-model/deployment_cluster.xml -state > states/set-'+str(tuple_index)+".csv"], shell=True)
+            state_cmd = './trials_simulator xmls/plat_day.xml ' + self.deployment_file + ' -state > states/set-'+str(tuple_index)+'.csv' 
+            subprocess.call([state_cmd], shell=True)
 
             if(os.path.exists("result-temp.dat") == True):
                 subprocess.call(['rm result-temp.dat'], shell=True)
@@ -101,7 +105,9 @@ class SchedulingSimulator:
                     for k in range(self.state_size):
                         iteration_file.write(str(queue_jobs['p'][permutation_indexes[trial_index, k]])+","+str(queue_jobs['q'][permutation_indexes[trial_index, k]])+","+str(queue_jobs['r'][permutation_indexes[trial_index, k]])+"\n")
 
-                subprocess.call(['./trials_simulator simple_cluster.xml deployment_cluster.xml >> result-temp.dat'], shell=True)
+                # subprocess.call(['./trials_simulator first-model/simple_cluster.xml first-model/deployment_cluster.xml >> result-temp.dat'], shell=True)
+                trial_cmd = './trials_simulator xmls/plat_day.xml ' + self.deployment_file + ' >> result-temp.dat' 
+                subprocess.call([trial_cmd], shell=True)
 
             output = "" 
             exp_sum_slowdowns = 0.0
