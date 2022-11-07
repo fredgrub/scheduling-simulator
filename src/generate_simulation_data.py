@@ -6,6 +6,35 @@ from scheduling_simulator import SchedulingSimulator
 
 def main():
 
+    clear = True
+    if clear:  
+        if len(glob.glob("training-data/*.csv")) != 0:
+            subprocess.call(['rm training-data/*.csv'], shell=True)
+        if len(glob.glob("task-sets/*.csv")) != 0:
+            subprocess.call(['rm task-sets/*.csv'], shell=True)
+        if len(glob.glob("states/*.csv")) != 0:
+            subprocess.call(['rm states/*.csv'], shell=True)
+        
+        if(os.path.exists("result-temp.dat") == True):
+            subprocess.call(['rm result-temp.dat'], shell=True)
+        if(os.path.exists("current-simulation.csv") == True):
+            subprocess.call(['rm current-simulation.csv'], shell=True)
+
+        exit()
+
+    workload_file = "first-model/lublin_256.swf"
+    deployment_file = "first-model/deployment_cluster.xml"
+    platform_file = "first-model/simple_cluster.xml"
+    number_of_tuples = 1
+    number_of_trials = 100
+    state_size = 16
+    queue_size = 32
+    random_seed = None
+
+    simulator = SchedulingSimulator(workload_file, deployment_file, platform_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed)
+    simulator.simulate()
+
+def alternative_main():
     parser = argparse.ArgumentParser(
                     prog = 'Scheduling Simulator',
                     description = 'Compute the score distribution for a given HPC platform simulation.',
@@ -49,6 +78,6 @@ def main():
 
     simulator = SchedulingSimulator(workload_file, deployment_file, platform_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed)
     simulator.simulate()
-    
+
 if __name__ == "__main__":
     main()
