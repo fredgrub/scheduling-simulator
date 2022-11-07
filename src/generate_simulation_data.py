@@ -13,6 +13,7 @@ def main():
 
     parser.add_argument('filename', nargs='?', type=str, help='workload file')
     parser.add_argument('deployment_file', nargs='?', type=str, help='deployment file')
+    parser.add_argument('platform_file', nargs='?', type=str, help='platform file')
     parser.add_argument('s_size', nargs='?', type=int, help='state set size')
     parser.add_argument('q_size', nargs='?', type=int, help='queue set size')
     parser.add_argument('num_tuples', nargs='?', type=int, help='number of tuples (S,Q)')
@@ -39,13 +40,14 @@ def main():
     
     workload_file = args.filename
     deployment_file = args.deployment_file
+    platform_file = args.platform_file
     number_of_tuples = args.num_tuples
     number_of_trials = args.num_trials
     state_size = args.s_size
     queue_size = args.q_size
     random_seed = args.seed
 
-    simulator = SchedulingSimulator(workload_file, deployment_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed)
+    simulator = SchedulingSimulator(workload_file, deployment_file, platform_file, number_of_tuples, number_of_trials, state_size, queue_size, random_seed)
     simulator.simulate()
     
 if __name__ == "__main__":
