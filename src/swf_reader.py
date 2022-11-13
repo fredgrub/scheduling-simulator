@@ -6,6 +6,7 @@ class ReaderSWF:
         self.number_of_jobs = None
         self.number_of_nodes = None
         self.jobs_info = {'p': [], 'q': [], 'r': []}
+        self.read_and_extract_data()
 
     def read_and_extract_data(self):
         with open(self.filename, 'r') as reader:

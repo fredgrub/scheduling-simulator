@@ -15,7 +15,6 @@ import src.swf_reader as swf_reader
 ])
 def test_read_swf(workload_file, number_of_jobs, number_of_nodes):
     reader = swf_reader.ReaderSWF(workload_file)
-    reader.read_and_extract_data()
     
     assert reader.number_of_jobs == number_of_jobs
     assert reader.number_of_nodes == number_of_nodes
