@@ -74,9 +74,9 @@ class Simulator:
 
                 current_tuple.write(str(self._jobs_S['p'][i])+","+str(self._jobs_S['q'][i])+","+str(self._jobs_S['r'][i])+"\n")
             for i in range(self.size_of_Q):
-                self._jobs_Q['p'].append(self.model_jobs['p'][rng_index + i])
-                self._jobs_Q['q'].append(self.model_jobs['q'][rng_index + i])
-                self._jobs_Q['r'].append(self.model_jobs['r'][rng_index + i] - earliest_submit)
+                self._jobs_Q['p'].append(self.model_jobs['p'][self.size_of_S + rng_index + i])
+                self._jobs_Q['q'].append(self.model_jobs['q'][self.size_of_S + rng_index + i])
+                self._jobs_Q['r'].append(self.model_jobs['r'][self.size_of_S + rng_index + i] - earliest_submit)
                 
                 current_tuple.write(str(self._jobs_Q['p'][i])+","+str(self._jobs_Q['q'][i])+","+str(self._jobs_Q['r'][i])+"\n")
 
