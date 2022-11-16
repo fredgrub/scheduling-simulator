@@ -1,14 +1,13 @@
-FROM ubuntu:18.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-18.04
+
 ARG SIMGRID_URL=https://framagit.org/simgrid/simgrid/-/archive/v3_13/simgrid-v3_13.tar.gz
 
-# Update and install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get -y install \
     python3 \
     python3-pip \
-    wget \
     build-essential \
     cmake \
-    git \
     libboost-dev \
     libboost-all-dev
 
@@ -34,9 +33,3 @@ RUN apt-get autoremove -y \
     libboost-all-dev && \
     apt-get autoclean && \
     apt-get clean
-
-WORKDIR /usr/src/python_dependencies
-
-# Install Python dependencies
-COPY requirements.txt ./
-RUN pip3 install --no-cache-dir -r requirements.txt
