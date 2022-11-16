@@ -2,6 +2,7 @@ import os
 import numpy as np
 import shutil
 import subprocess
+import argparse
 from random import seed, randint
 from swf_reader import ReaderSWF
 
@@ -184,36 +185,51 @@ class Simulator:
             score_dist = self.compute_AVGbsld(tuple_index)
             self.save_score_distribution(tuple_index, score_dist)
 
-    def delete_csv_files_from(self, directory):
+    @staticmethod
+    def delete_csv_files_from(directory):
         for file in os.listdir(directory):
             if file.endswith(".csv"):
                 os.remove(os.path.join(directory, file))
 
-    def clear_files(self):
-        if os.path.isfile(self._result_file):
-            os.remove(self._result_file)
-        if os.path.isfile(self._current_file):
-            os.remove(self._current_file)
+    @classmethod
+    def clear_files(cls):
+        if os.path.isfile(cls._result_file):
+            os.remove(cls._result_file)
+        if os.path.isfile(cls._current_file):
+            os.remove(cls._current_file)
         
-        self.delete_csv_files_from(self._training_data_path)
-        self.delete_csv_files_from(self._states_path)
-        self.delete_csv_files_from(self._task_sets_path)
+        cls.delete_csv_files_from(cls._training_data_path)
+        cls.delete_csv_files_from(cls._states_path)
+        cls.delete_csv_files_from(cls._task_sets_path)
 
 def main():
-    workload = "first-model/lublin_256.swf"
-    deployment = "first-model/deployment_cluster.xml"
-    cluster = "first-model/simple_cluster.xml"
 
-    number_of_tuples = 1
-    number_of_trials = 100
-    size_of_S = 16
-    size_of_Q = 32
-    fixed_seed = False
+    parser = argparse.ArgumentParser(prog="Simulator", fromfile_prefix_chars="@", allow_abbrev=False)
 
-    simulator = Simulator(workload, deployment, cluster, number_of_tuples, number_of_trials, size_of_S, size_of_Q, fixed_seed)
+    parser.add_argument('workload_file', type=str, nargs='?', help='Workload file (swf)')
+    parser.add_argument('deployment_file', type=str, nargs='?', help='Application deployment file (xml)')
+    parser.add_argument('platform_file', type=str, nargs='?', help='Simulation settings file (xml)')
 
-    simulator.clear_files()
-    # simulator.simulate()
+    parser.add_argument('number_of_tuples', type=int, nargs='?', help='Number of (S,Q) tuples to simulate')
+    parser.add_argument('number_of_trials', type=int, nargs='?', help='Number of permutations of Q')
+    parser.add_argument('size_of_S', type=int, nargs='?', help='Number of jobs in set S')
+    parser.add_argument('size_of_Q', type=int, nargs='?', help='Number of jobs in set Q')
+
+    parser.add_argument('--fixed-seed', action='store_true', help='Fix a seed for the RNG')
+    parser.add_argument('--clear', action='store_true', help='Clear simulation files')
+
+    args = parser.parse_args()
+
+    if not args.clear:
+        simulator = Simulator(
+            args.workload_file, args.deployment_file, args.platform_file, 
+            args.number_of_tuples, args.number_of_trials, 
+            args.size_of_S, args.size_of_Q, 
+            args.fixed_seed)
+            
+        simulator.simulate()
+    else:
+        Simulator.clear_files()
 
 if __name__ == "__main__":
     main()
