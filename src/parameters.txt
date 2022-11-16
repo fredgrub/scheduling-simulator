@@ -1,6 +1,6 @@
-first-model/lublin_256.swf
-first-model/deployment_cluster.xml
-first-model/simple_cluster.xml
+swfs/lublin_256.swf
+deployment_cluster.xml
+simple_cluster.xml
 1
 100
 16
