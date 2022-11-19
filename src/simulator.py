@@ -29,7 +29,7 @@ class Simulator:
         self.tuple_size = size_of_S + size_of_Q
 
         self.number_of_jobs = None
-        self.number_of_nodes = None
+        self.number_of_processors = None
         self.model_jobs = None
         self.get_workload_info()
 
@@ -40,7 +40,7 @@ class Simulator:
         reader = ReaderSWF(self.workload)
         self.model_jobs = reader.jobs_info
         self.number_of_jobs = reader.number_of_jobs
-        self.number_of_nodes = reader.number_of_nodes
+        self.number_of_processors = reader.number_of_processors
 
     def get_start_index(self):
         start = 0
@@ -64,7 +64,7 @@ class Simulator:
     def store_tuple(self, index):
         with open(self.get_task_sets_file(index), "w+") as current_tuple:
             rng_index = self.get_random_index()
-
+            
             earliest_submit = self.model_jobs['r'][rng_index]
 
             for i in range(self.size_of_S):
