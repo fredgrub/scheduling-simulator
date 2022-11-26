@@ -53,7 +53,7 @@ class Regressor:
         print(f"Fitted function: {self.polynomial.__name__}")
         print(f"Intercept: {self.popt[0]:E}")
         print(f"Coeficients:\n{self.popt[1:]}\n")
-        print(f"Mean Absolute Error: {self._compute_mae():E}")
+        print(f"Mean Absolute Error: {self._compute_mae():E}\n")
 
     def make_regression(self):
         self._fit_function()
@@ -61,5 +61,8 @@ class Regressor:
         self._report()
 
 if __name__ == '__main__':
-    regressor = Regressor("src/regressor/dummy-score.csv", qdr)
-    regressor.make_regression()
+
+    for score_dist in ["lublin-256-final-score.csv", "ctc-sp2-final-score.csv", "sdsc-blue-final-score.csv"]:
+        for heuristic in [lin, qdr, cub, qua, qui, sex]:
+            regressor = Regressor(score_dist, heuristic)
+            regressor.make_regression()
