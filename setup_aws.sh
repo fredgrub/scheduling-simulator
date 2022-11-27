@@ -33,5 +33,3 @@ apt-get autoremove -y \
     libboost-all-dev && \
     apt-get autoclean && \
     apt-get clean
-
-cd /usr/src/python_dependencies
