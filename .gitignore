@@ -1,4 +1,6 @@
 .pytest_cache
 __pycache__
-src/trials_simulator
+src/simulator/trials_simulator
+src/tester/sched-simulator-runtime
+src/tester/sched-simulator-estimate-backfilling
 .vscode
