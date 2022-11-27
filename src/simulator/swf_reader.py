@@ -28,7 +28,7 @@ class ReaderSWF:
                 if int(row[4]) > 0 and int(row[4]) <= self.number_of_processors and int(row[3]) > 0 and int(row[8]) > 0:
                     jobs_counter += 1
                     self.jobs_info['p'].append(int(row[3]))
-                    self.jobs_info['~p'].appen(int(row[8]))
+                    self.jobs_info['~p'].append(int(row[8]))
                     self.jobs_info['q'].append(int(row[4]))
                     self.jobs_info['r'].append(int(row[1]))
             
