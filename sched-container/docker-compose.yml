@@ -1,0 +1,7 @@
+version: '3'
+services:
+  sched-simulator:
+    build:
+      context: ./sched-container
+    volumes:
+      - ./:/home/vscode/dev
