@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:debian-11
+FROM mcr.microsoft.com/devcontainers/base:bullseye
 
 ARG SIMGRID_URL=https://framagit.org/simgrid/simgrid/-/archive/v3_13/simgrid-v3_13.tar.gz
 
@@ -22,6 +22,6 @@ RUN echo "DOWNLOAD_URL: ${SIMGRID_URL}" && \
     apt autoremove -y && apt autoclean && apt clean
 
 # Build tools and python3
-RUN apt-get install -y build-essential cmake python3 python3-pip 
+RUN apt-get install -y build-essential cmake 
 
 ENV DEBIAN_FRONTEND=dialog
