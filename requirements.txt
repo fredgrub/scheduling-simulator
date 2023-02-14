@@ -2,3 +2,8 @@ numpy
 pytest
 scipy
 statsmodels
+scikit-learn
+matplotlib
+seaborn
+jupyter
+notebook
