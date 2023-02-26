@@ -1,7 +1,0 @@
-swfs/lublin_256.swf
-deployment_cluster.xml
-simple_cluster.xml
-1
-100
-16
-32
