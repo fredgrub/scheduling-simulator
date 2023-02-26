@@ -1,7 +1,30 @@
-.pytest_cache
-__pycache__
-src/simulator/trials_simulator
-src/tester/sched-simulator-runtime
-src/tester/sched-simulator-estimate-backfilling
-.vscode
-*-checkpoint.ipynb
+# IDEs
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
