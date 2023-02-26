@@ -1,0 +1,19 @@
+{
+    "fitsim": [
+        {
+            "name": "Score distribution (Lublin 256 workload)",
+            "filename": "lublin-256-final-score.csv",
+            "file-id": "1g4DvCxirJ120mTJbqsHI_kfCp67I9gZN"
+        },
+        {
+            "name": "Score distribution (CTC-SP2 workload)",
+            "filename": "ctc-sp2-final-score.csv",
+            "file-id": "1-5KPPduIMoVJyGnq9LpVa-1QqF_EqLd3"
+        },
+        {
+            "name": "Score distribution (SDSC-Blue workload)",
+            "filename": "sdsc-blue-final-score.csv",
+            "file-id": "1-7fQVRNCo6vvpDxsflOALFHwp4B8zRvV"
+        }
+    ]
+}
