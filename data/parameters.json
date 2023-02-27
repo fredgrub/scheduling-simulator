@@ -1,0 +1,14 @@
+{
+    "fitsim": {
+        "score-file": "lublin-256-final-score.csv",
+        "report-file": "regression_report.json",
+        "functions": [
+            "linear",
+            "quadratic",
+            "cubic",
+            "quartic",
+            "quintic",
+            "sextic"
+        ]
+    }
+}

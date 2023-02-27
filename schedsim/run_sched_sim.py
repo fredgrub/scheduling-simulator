@@ -1,12 +1,7 @@
 import gdown
 import json
 import pathlib
-import time
-from fitsim.regressor import Regressor
-from fitsim.polynomials import *
-from rich.prompt import Prompt, Confirm
-from rich.console import Console
-from rich import print
+import argparse
 
 DATA_DIR = pathlib.Path("data")
 
@@ -28,81 +23,44 @@ def check_and_download_data(module_name):
         file_to_download = file_metadata["filename"]
 
         if not (module_dir / file_to_download).exists():
-            print(f"[dim blue]Downloading {file_to_download}")
             gdown.download(
                 id=file_id,
                 output=str(module_dir / file_to_download),
                 quiet=True,
             )
 
-    print("[bold green]Done![/bold green]")
-    time.sleep(1)
-
-
-def run_fitsim():
-    """
-    Run the fitsim module.
-    """
-
-    functions = {
-        "linear": lin,
-        "quadratic": qdr,
-        "cubic": cub,
-        "quartic": qua,
-        "quintic": qui,
-    }
-
-    # Display the available functions
-    print("[bold blue]Available functions:[/bold blue]")
-    for i, poly in enumerate(functions):
-        print(f"[bold blue]{i + 1}.[/bold blue] {poly}")
-
-    func_input = Prompt.ask(
-        "[bold blue]Which functions do you want to use?[/bold blue] "
-        + "(separate with commas and no spaces)"
-    )
-
-    # Convert the input to a list of functions
-    functions_selected = [functions[func] for func in func_input.split(",")]
-
-    # Ask the user for the score file
-    score_file = Prompt.ask(
-        "[bold blue]Which score file do you want to use?[/bold blue] "
-        + "(must be in the fitsim directory)"
-    )
-    exit()
-    # TODO: rewrite the regressor class to use multiple functions
-    regressor = Regressor(
-        DATA_DIR / "fitsim" / score_file,
-        functions_selected,
-    )
-
 
 if __name__ == "__main__":
-    # Write an welcome message
-    print("[bold green]Welcome to the Scheduling Simulator code![/bold green]")
-
-    module = Prompt.ask(
-        "Which module do you want to run?",
-        choices=["proxysim", "fitsim", "schedsim"],
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--module",
+        type=str,
+        help="The module to run",
+        choices=["schedsim", "fitsim", "expsim"],
+        required=True,
     )
+    args = parser.parse_args()
 
-    print(f"[yellow italic]Checking for data files for {module}...")
-    check_and_download_data(module)
+    selected_module = args.module
 
-    if module == "proxysim":
-        print("Not implemented yet!")
-    elif module == "fitsim":
-        run_fitsim()
-    elif module == "schedsim":
-        print("Not implemented yet!")
+    check_and_download_data(selected_module)
 
-    # create a regressor object
-    # regressor = Regressor(
-    #     DATA_DIR / score_file,
-    #     lin,
-    # )
+    parameters = json.load(open(DATA_DIR / "parameters.json"))
+    selected_parameters = parameters[selected_module]
 
-    # # perform the regression
-    # file_to_save = DATA_DIR / "regression_results.json"
-    # regressor.regression(file_to_save)
+    if selected_module == "schedsim":
+        pass
+    elif selected_module == "fitsim":
+        import fitsim.regressor as rgr
+
+        regressor = rgr.Regressor(
+            DATA_DIR / selected_module / selected_parameters["score-file"],
+            selected_parameters["functions"],
+        )
+
+        regressor.regression(
+            DATA_DIR / selected_module / selected_parameters["report-file"]
+        )
+
+    elif selected_module == "expsim":
+        pass
