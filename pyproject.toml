@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "schedsim"
+version = "0.1.0"
+description = ""
+authors = ["Lucas de Sousa Rosa <roses.lucas404@gmail.com>"]
+license = "LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+gdown = "^4.6.4"
+scipy = "^1.10.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
