@@ -1,9 +1,12 @@
 numpy
-pytest
 scipy
+pandas
 statsmodels
 scikit-learn
+gdown
+pytest
 matplotlib
 seaborn
 jupyter
 notebook
+black

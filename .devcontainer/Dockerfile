@@ -22,6 +22,6 @@ RUN echo "DOWNLOAD_URL: ${SIMGRID_URL}" && \
     apt autoremove -y && apt autoclean && apt clean
 
 # Build tools and python3
-RUN apt-get install -y build-essential cmake 
+RUN apt-get install -y build-essential cmake python3-pip python3-venv
 
 ENV DEBIAN_FRONTEND=dialog
