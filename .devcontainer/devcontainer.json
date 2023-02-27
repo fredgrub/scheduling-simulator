@@ -1,7 +1,8 @@
 {
-	"name": "Debian",
+	"name": "SchedSim",
 	"build": {
-		"dockerfile": "Dockerfile"
+		"context": "..",
+		"dockerfile": "../Dockerfile"
 	},
 	"forwardPorts": [
 		"10000:8888"
@@ -10,16 +11,9 @@
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
-				"ms-vscode.cpptools"
+				"ms-vscode.cpptools",
+				"GitHub.copilot"
 			]
 		}
-	},
-	"postCreateCommand": [
-		"python3",
-		"-m",
-		"pip",
-		"install",
-		"-r",
-		"requirements.txt"
-	]
+	}
 }
