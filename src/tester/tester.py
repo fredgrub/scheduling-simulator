@@ -171,14 +171,6 @@ def workload_experiments(workloads, policies, sim_types):
                 _buffer = open(EXPERIMENTS_DIR / "plot-temp.dat", "w+")
                 for policy in policies:
                     policy_flag = policies_flags[policy]
-                    # subprocess.call(
-                    #     [
-                    #         f"./{simulators[sim_type]} xmls/plat_day.xml xmls/{deploy_file} {backfilling_flag} {policy_flag} -nt {number_of_jobs}"
-                    #     ],
-                    #     shell=True,
-                    #     stdout=_buffer,
-                    # )
-                    # Rewrite the subprocess.call() above using .run() and cwd=EXPERIMENTS_DIR
                     subprocess.run(
                         [
                             f"./{simulators[sim_type]}",
@@ -205,9 +197,6 @@ def workload_experiments(workloads, policies, sim_types):
 
                 slowdowns = pd.concat([slowdowns, temp_data], ignore_index=True)
 
-            # slowdowns.to_csv(
-            #     f"experiments/{workload_trace}_{sim_type}_{number_of_experiments}_{number_of_policies}.csv", index=False
-            # )
             slowdowns.to_csv(
                 EXPERIMENTS_DIR / f"{workload_trace}_{sim_type}_{number_of_experiments}_{number_of_policies}.csv",
                 index=False,
