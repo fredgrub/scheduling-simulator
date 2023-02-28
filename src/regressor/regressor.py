@@ -1,30 +1,12 @@
 import json
-import gdown
+import pathlib
 import numpy as np
-import os
 from scipy.optimize import curve_fit
 from polynomials import *
 
-DOWNLOADABLE_DATA = [
-    {
-        "name": "Score distribution (Lublin 256 workload)",
-        "file-name": "lublin-256-final-score.csv",
-        "file-id": "1g4DvCxirJ120mTJbqsHI_kfCp67I9gZN",
-    },
-    {
-        "name": "Score distribution (CTC-SP2 workload)",
-        "file-name": "ctc-sp2-final-score.csv",
-        "file-id": "1-5KPPduIMoVJyGnq9LpVa-1QqF_EqLd3",
-    },
-    {
-        "name": "Score distribution (SDSC-Blue workload)",
-        "file-name": "sdsc-blue-final-score.csv",
-        "file-id": "1-7fQVRNCo6vvpDxsflOALFHwp4B8zRvV",
-    },
-]
-
-SCORE_DISTRIBUTION = "lublin-256-final-score.csv"
-REPORT_FILE = "regression_report.json"
+DATA_DIR = pathlib.Path(__file__).parent.parent.parent / "data"
+SCORE_DISTRIBUTION = DATA_DIR / "score" / "lublin-256-final-score.csv"
+REPORT_FILE = DATA_DIR / "regression_report.json"
 FUNCTIONS = [lin, qdr, cub, qua, qui, sex]
 
 
@@ -208,25 +190,9 @@ class Regressor:
             json.dump(reports, f, indent=4)
 
 
-def check_and_download_data():
-    for file in DOWNLOADABLE_DATA:
-        file_id = file["file-id"]
-        file_name = file["file-name"]
-
-        if not os.path.exists(file_name):
-            gdown.download(
-                id=file_id,
-                output=file_name,
-                quiet=True,
-            )
-
-
 if __name__ == "__main__":
-    print("Checking if the data is downloaded...")
-    check_and_download_data()
-
     print("Performing the regression...")
     regressor = Regressor(SCORE_DISTRIBUTION, FUNCTIONS)
     regressor.regression(REPORT_FILE)
-
     print("Done!")
+    print("Regression report saved to '{}'".format(REPORT_FILE))
