@@ -5,7 +5,7 @@ from scipy.optimize import curve_fit
 from polynomials import *
 
 DATA_DIR = pathlib.Path(__file__).parent.parent.parent / "data"
-SCORE_DISTRIBUTION = DATA_DIR / "score" / "lublin-256-final-score.csv"
+SCORE_DISTRIBUTION = DATA_DIR / "scores" / "lublin-256-final-score.csv"
 REPORT_FILE = DATA_DIR / "regression_report.json"
 FUNCTIONS = [lin, qdr, cub, qua, qui, sex]
 
