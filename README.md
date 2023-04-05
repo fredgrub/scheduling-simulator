@@ -1,6 +1,6 @@
 # An experimental analysis of regression-obtained HPC scheduling heuristics (source material)
 
-This repository contains the companion material for the research worl **An experimental analysis of regression-obtained HPC scheduling heuristics**.
+This repository contains the companion material for the research work **An experimental analysis of regression-obtained HPC scheduling heuristics**.
 The authors are:
 Lucas Rosa, Danilo Carastan-Santos and Alfredo Goldman
 
