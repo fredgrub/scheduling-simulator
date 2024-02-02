@@ -46,3 +46,30 @@ initialize the number of jobs and processors by reading the workload given to th
 ***** store_tuple(self, index)
 store in _jobs_S and _jobs_Q jobs stored in model_jobs as it said in the paper with M, to apply this we used get_random_index() to define the begining of the set M.
 + Remark : _jobs_S and _jobs_Q -> ["p"]["q"]["r"]
++ Remark : nodes = processors
+***** create_permutation (self, index, shuffled_Q)
+As it's explain on the paper, we compute |Q| permutation of the set Q to construct multple branch of simulation.
+****** TODO :: What does mean a branch of simulation?
+***** schedule_trials(self)
+Create a a new permutation for each trial
+***** compute_AVGbsld(self,index)
+Apply the computation of the score(j) based on the equation 3 of the paper
+****** TODO :: more Understand the function
+***** simulate(self)
+call all the functions described previously to compute the simulation.
+*** regressor.py
+**** Regressor Attributes
++ functions : list of functions used for the multiple linear regression
++ data_set : dataset on which we compute the regression
+**** Regressor Methods
+***** _compute_weights(self)
+compute the weights for the regression by computing 1/(p*q) for all the enteries of the dataset
+***** _fit_function(self,function)
+Fit the function given as parameter to the dataset by using scipy.optimize.curve_fit
+****** TODO :: Understand what does curve_fit
+***** _predict_y(self, function, optimal_parameters)
+Applying the function given as parameter to the dataset and return the result in an array
+***** _compute_mae(self, predicted_y)
+compute the mean absolute error of the prediction with the attribute score of the dataset
+***** regression(self, output_file, include_covariance=False)
+apply the regression with all the functions contain by the object Regressor and write the result into a file
