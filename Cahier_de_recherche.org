@@ -5,12 +5,44 @@
 ** Prise en mains du repertoire gitHub
 + Fork du repertoire https://github.com/fredgrub/scheduling-simulator
 + Prise main de Docker
-+ @TODO :: Mettre à jour la version de python 3.9.12  -> 3.9.2
-+ @TODO :: Mieux comprendre l'utilisation de conteneurs docker
+*** TODO :: Mettre à jour la version de python 3.9.12  -> 3.9.2
+*** TODO :: Mieux comprendre l'utilisation de conteneurs docker
 ** Erreurs rencontrée :
 + You may still be able to access the file from the browser:https://drive.google.com/uc?id=1MkSKglrQeI8rEO9hbr-7kYEvSHhrpFKG but Gdown can't. Please check connections and permissions.
   + commande : sudo docker run --rm -v "$(pwd)":/workspaces/scheduling-simulator/ build-simgrid bash -c "python /workspaces/scheduling-simulator/initialize.py"
 + que représente la commande : $\operatorname{score}(p, q, r)$
 + après l'éxécution de la commande : nohup python src/simulator/simulator.py & , le dossier data censé contenir les données de la simulation est vide.
   + donc la commande python /src/regressor/regressor.py échoue.
-+ @TODO :: regler l'erreur et comprendre la synthax de docker run
+**** DONE :: regler l'erreur et comprendre la synthax de docker run
+
+
+
+* vendredi 2 février
+** Code modification
++ line 388 : src/simulator/trial_simulator.c -> commentary (todo[i]->name problem)
++ line 677 : src/tester/sched-simulator-runtime.c ->commentary (todo[i]->name problem)
++ line 624 : src/tester/sched-simulator-backfilling.c -> commentary (todo[i]->name problem)
+*** TODO :: Understand why the todo[i]->name problem occur
+** Files understanding
+*** simulator.py
++ S = initial state of the HPC
++ Q = sets of jobs to be schedule into the HPC
++ SIMULATION_PARAMETERS :
+  + number_of_tuples : number of binome S-Q
+  + number_of_trials : number of time we schedule the jobs in Q
+  + size_of_S : number of jobs in S
+  + size_of_Q : number of jobs in Q
+**** Simulator attributes
++ _jobs_S : the initial state of the simulated HPC before scheduling
++ _jobs_Q : the set of jobs to be schedule
+***** TODO :: Verifier les autres attributs avec Danilo si possible
+**** Simulator constructor
++ workload : workload model used to define the simulator
+***** TODO :: Understand what does mean the arguments deployment, cluster and fixed_seed
+**** Simulator Methods
+***** get_workload_info(self)
+initialize the number of jobs and processors by reading the workload given to the constructor
+****** TODO :: What does mean model_jobs?
+***** store_tuple(self, index)
+store in _jobs_S and _jobs_Q jobs stored in model_jobs as it said in the paper with M, to apply this we used get_random_index() to define the begining of the set M.
++ Remark : _jobs_S and _jobs_Q -> ["p"]["q"]["r"]

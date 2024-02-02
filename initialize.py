@@ -12,14 +12,14 @@ import gdown
 def download_from_google_drive():
     print("Downloading data...")
 
-    if not os.path.exists("data"):
-        gdown.download_folder(
-            url="https://drive.google.com/drive/u/1/folders/1sFNmbXz3tTxjlvkFIGrQswVFU8fPsCeE",
-            quiet=True,
-            use_cookies=False,
-        )
-    else:
-        print("Data already downloaded!")
+    #if not os.path.exists("data"):
+        #gdown.download_folder(
+        #    url="https://drive.google.com/drive/u/1/folders/1sFNmbXz3tTxjlvkFIGrQswVFU8fPsCeE",
+       #     quiet=True,
+      #      use_cookies=False,
+     #   )
+    #else:
+    print("Data already downloaded!")
 
 
 def compile_c_programs():
