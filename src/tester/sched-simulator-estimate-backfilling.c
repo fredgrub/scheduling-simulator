@@ -621,7 +621,7 @@ int master(int argc, char *argv[])
             todo[i] = MSG_task_create(sprintf_buffer, comp_size, comm_size, &task_queue[i]);
 
             if (VERBOSE)
-                //XBT_INFO("Dispatching \"%s\" [r=%.1f,c=%d,s=%d,est=%.1f]", todo[i]->name, all_runtimes[i], all_cores[i], all_submit[i], all_req_runtimes[i]);
+                XBT_INFO("Dispatching \"%s\" [r=%.1f,c=%d,s=%d,est=%.1f]", todo[i], all_runtimes[i], all_cores[i], all_submit[i], all_req_runtimes[i]);
 
             MSG_task_send(todo[i], MSG_host_get_name(workers[i]));
 

@@ -1,0 +1,43 @@
+Performing scheduling performance test for the workload trace CTC-SP2.
+Configuration: ACTUAL
+Performing scheduling experiment 1. Number of tasks=2835
+Performing scheduling experiment 2. Number of tasks=3836
+Performing scheduling experiment 3. Number of tasks=4089
+Performing scheduling experiment 4. Number of tasks=2987
+Performing scheduling experiment 5. Number of tasks=3079
+Performing scheduling experiment 6. Number of tasks=3446
+Performing scheduling experiment 7. Number of tasks=3152
+Performing scheduling experiment 8. Number of tasks=3554
+Performing scheduling experiment 9. Number of tasks=4560
+Performing scheduling experiment 10. Number of tasks=3824
+Performing scheduling experiment 11. Number of tasks=2950
+Performing scheduling experiment 12. Number of tasks=4127
+Performing scheduling experiment 13. Number of tasks=3257
+Performing scheduling experiment 14. Number of tasks=2718
+Performing scheduling experiment 15. Number of tasks=3157
+Performing scheduling experiment 16. Number of tasks=4559
+Performing scheduling experiment 17. Number of tasks=3551
+Performing scheduling experiment 18. Number of tasks=3559
+Performing scheduling experiment 19. Number of tasks=3062
+Performing scheduling experiment 20. Number of tasks=2726
+Performing scheduling experiment 21. Number of tasks=3376
+Performing scheduling experiment 22. Number of tasks=2773
+Performing scheduling performance test for the workload trace CTC-SP2.
+Configuration: ESTIMATED
+Performing scheduling experiment 1. Number of tasks=2835
+Performing scheduling experiment 2. Number of tasks=3836
+Performing scheduling experiment 3. Number of tasks=4089
+Performing scheduling experiment 4. Number of tasks=2987
+Performing scheduling experiment 5. Number of tasks=3079
+Performing scheduling experiment 6. Number of tasks=3446
+Performing scheduling experiment 7. Number of tasks=3152
+Performing scheduling experiment 8. Number of tasks=3554
+Performing scheduling experiment 9. Number of tasks=4560
+Performing scheduling experiment 10. Number of tasks=3824
+Performing scheduling experiment 11. Number of tasks=2950
+Performing scheduling experiment 12. Number of tasks=4127
+Performing scheduling experiment 13. Number of tasks=3257
+Performing scheduling experiment 14. Number of tasks=2718
+Performing scheduling experiment 15. Number of tasks=3157
+Performing scheduling experiment 16. Number of tasks=4559
+Performing scheduling experiment 17. Number of tasks=3551

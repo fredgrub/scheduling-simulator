@@ -73,3 +73,69 @@ Applying the function given as parameter to the dataset and return the result in
 compute the mean absolute error of the prediction with the attribute score of the dataset
 ***** regression(self, output_file, include_covariance=False)
 apply the regression with all the functions contain by the object Regressor and write the result into a file
+* mercredi 7 février
+** File understanding
+*** tester.py
+**** workload_experiments(workloads, policies, sim_type)
+***** Parameters
++ parameter workloads : an array of string which represent in which represent the workloads used to based our simulation
+  + possible values :  ["CTC-SP2", "SDSC-BLUE", "LUBLIN 256"]
++ parameter policies : array of string which represent the policies used to schedule the jobs in Q in our experiments
+  + possible values : ["FCFS", "WFP3", "UNICEF", "SPT", "SAF", "F2", "LIN", "QDR", "CUB", "QUA", "QUI", "SEX"]
++ parameter sim_type : an array of string which represent the type of simulator we want to use in our simulation
+  + possible values : ["ACTUAL", "ESTIMATED"]
+****** TODO :: knowing the role of each workload and the particularity of each simulation type
+***** Function
++ incomprehension line 98-99 tester.py
++ 1 : strat by collecting informations about the workloads and the type of simulator used
++ 2 : defining a dataframe slowdown where to store all slowdowns from all experiments
++ 3.1 : Defining S and Q from the choosen workload as it's done in simulator.py
++ 3.2 : In the case where the type of simulator used is not "ACTUAL" we must additionally used the attribute ~p which represent the estimated job's processing time
++ 4 : Compute the scheduling experiment of Q for each policy in the parameter policies by the using of the method subprocess.run
++ 5 : write all the slowdowns computed during the experiment in a csv file
+** Problem
+*** TODO :: Simulation
+When I want to launch the simulation by the command python tester.py the simulation didn't occurs and reapeat the same line  : [1295866.000000] [ker_engine/INFO] 2836 actors are still running, waiting for something.
++ Jean Francois said to me :
+  + the simulation must start at 0 but in our case the simulation start at 1295866 so it's strange, the cause can be an error in  the end of the simulation. May be the problem can occurs durring the cloture of the simulation.
++ head of err.log :
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[1295866.000000] ./src/kernel/EngineImpl.cpp:851: [ker_engine/CRITICAL] Oops! Deadlock or code not perfectly clean.
+[1295866.000000] [ker_engine/INFO] 2836 actors are still running, waiting for something.
+[1295866.000000] [ker_engine/INFO] Legend of the following listing: "Actor <pid> (<name>@<host>): <status>"
+[1295866.000000] [ker_engine/INFO] Actor 1 (master@node-0) simcall Simcall::RUN_BLOCKING
++ nothing in out.log
+
+**** part of the problem solved
+un-commentation of the line commented 02/02/2024 but replacing todo[i]->name by todo[i]
++ out.log :
+Performing scheduling performance test for the workload trace CTC-SP2.
+Configuration: ACTUAL
+Performing scheduling experiment 1. Number of tasks=2835
++ head err.log :
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+**** TODO :: Use nix (ask Dorian)
+**** DONE :: Find the computation of VIF
++ In the method _fit_function(self,function) regressor.py line 77 by the call :
+    scipy.optimize.curve_fit(
+            function,
+            (self.data_set["p"], self.data_set["q"], self.data_set["r"]),
+            self.data_set["score"],
+            sigma=self._compute_weights(),
+            absolute_sigma=True,
+        )
+***** TODO :: reading curve_fit documentation : https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
