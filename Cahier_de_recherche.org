@@ -10,7 +10,6 @@
 ** Erreurs rencontrée :
 + You may still be able to access the file from the browser:https://drive.google.com/uc?id=1MkSKglrQeI8rEO9hbr-7kYEvSHhrpFKG but Gdown can't. Please check connections and permissions.
   + commande : sudo docker run --rm -v "$(pwd)":/workspaces/scheduling-simulator/ build-simgrid bash -c "python /workspaces/scheduling-simulator/initialize.py"
-+ que représente la commande : $\operatorname{score}(p, q, r)$
 + après l'éxécution de la commande : nohup python src/simulator/simulator.py & , le dossier data censé contenir les données de la simulation est vide.
   + donc la commande python /src/regressor/regressor.py échoue.
 **** DONE :: regler l'erreur et comprendre la synthax de docker run
