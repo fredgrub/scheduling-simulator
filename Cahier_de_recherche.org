@@ -99,6 +99,7 @@ When I want to launch the simulation by the command python tester.py the simulat
 + Jean Francois said to me :
   + the simulation must start at 0 but in our case the simulation start at 1295866 so it's strange, the cause can be an error in  the end of the simulation. May be the problem can occurs durring the cloture of the simulation.
 + head of err.log :
+#+begin_example
 [0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
 
 Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
@@ -109,6 +110,7 @@ Use simgrid_update_xml to update your file automatically to get rid of this warn
 [1295866.000000] [ker_engine/INFO] 2836 actors are still running, waiting for something.
 [1295866.000000] [ker_engine/INFO] Legend of the following listing: "Actor <pid> (<name>@<host>): <status>"
 [1295866.000000] [ker_engine/INFO] Actor 1 (master@node-0) simcall Simcall::RUN_BLOCKING
+#+end_example
 + nothing in out.log
 
 **** part of the problem solved
@@ -118,6 +120,7 @@ Performing scheduling performance test for the workload trace CTC-SP2.
 Configuration: ACTUAL
 Performing scheduling experiment 1. Number of tasks=2835
 + head err.log :
+#+begin_example
 [0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
 
 Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
@@ -128,6 +131,7 @@ Use simgrid_update_xml to update your file automatically to get rid of this warn
 
 Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
 [0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+#+end_example
 **** TODO :: Use nix (ask Dorian)
 **** DONE :: Find the computation of VIF
 + In the method _fit_function(self,function) regressor.py line 77 by the call :
