@@ -4,7 +4,7 @@ import pathlib
 import numpy as np
 import shutil
 import subprocess
-from random import seed, randint
+from random import seed, randint, shuffle, random
 
 # Add the src directory to the path so we can import the tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src")))
@@ -19,7 +19,9 @@ SIMULATION_PARAMETERS = {
     "application": str(DATA_DIR / "applications" / "deployment_cluster.xml"),
     "platform": str(DATA_DIR / "platforms" / "simple_cluster.xml"),
     "number-of-tuples": 1,
-    "number-of-trials": 1000,
+    "population-size": 40,
+    "mutation-prob": 0.05,
+    "number-of-generations": 500,
     "size-of-S": 16,
     "size-of-Q": 32,
 }
@@ -34,17 +36,23 @@ class Simulator:
     _task_sets_path = SIMULATION_DIR / "task-sets"
     _states_path = SIMULATION_DIR / "states"
     _training_data_path = SIMULATION_DIR / "training-data"
-    _permutation_indexes = None
+    _permutation_indices = None
+    _parents_indices = None
+    _children_indices = None
+    _current_generation = 0    
 
     def __init__(
-        self, workload, deployment, cluster, number_of_tuples, number_of_trials, size_of_S, size_of_Q, fixed_seed
+        self, workload, deployment, cluster, number_of_tuples, population_size, number_of_generations, mutation_prob, size_of_S, size_of_Q, fixed_seed
     ):
         self.workload = workload
         self.deployment = deployment
         self.cluster = cluster
 
         self.number_of_tuples = number_of_tuples
-        self.number_of_trials = number_of_trials
+        self.population_size = population_size
+        self.population_size_with_children = 2 * self.population_size
+        self.number_of_generations = number_of_generations
+        self.mutation_prob = mutation_prob
         self.size_of_S = size_of_S
         self.size_of_Q = size_of_Q
         self.tuple_size = size_of_S + size_of_Q
@@ -107,6 +115,7 @@ class Simulator:
 
     def create_initial_state(self, index):
         shutil.copyfile(self.get_task_sets_file(index), self._current_file)
+        #return
         subprocess.run(
             ["./trials_simulator", self.cluster, self.deployment, "-state"],
             stdout=open(self.get_states_file(index), "w+"),
@@ -119,15 +128,78 @@ class Simulator:
         if self.get_training_data_file(index).exists():
             self.get_training_data_file(index).unlink()
 
-    def initialize_permutation_indexes(self):
-        self._permutation_indexes = np.empty(shape=(self.number_of_trials, self.size_of_Q), dtype=int)
-        for j in range(0, self.number_of_trials):
-            self._permutation_indexes[j] = np.arange(self.size_of_Q)
+    
+    def mutate_children(self):
+        for children in self._children_indices:
+            for j in range(self.size_of_Q - 1):
+                rng = random()
+                if rng <= self.mutation_prob:
+                    swap = children[j + 1]
+                    children[j + 1] = children[j]
+                    children[j] = swap
 
-    def create_permutation(self, index, shuffled_Q):
+    
+    def crossover(self, _mother, _father, index):
+        _son_heritage_father = []
+        _daughter_heritage_mother = []
+        _m = 0
+        _f = 0
+        _son = self._children_indices[index]
+        _daughter = self._children_indices[(self.population_size // 2) + index]
+        _crossover_point = randint(0, self.size_of_Q - 1)
+        #print("Crossover point: ", _crossover_point)
+        # get genes from father
+        for i in range(0, self.size_of_Q):
+            if i <= _crossover_point:
+                # the son part
+                _son[i] = _father[i]
+                _son_heritage_father.append(_father[i])
+                # the daughter part
+                _daughter[i] = _mother[i]
+                _daughter_heritage_mother.append(_mother[i])
+            else:
+                #the son part
+                while _mother[_m] in _son_heritage_father:
+                    _m = _m + 1
+                _son[i] = _mother[_m]
+                _m = _m + 1
+                #the daughter part
+                while _father[_f] in _daughter_heritage_mother:
+                    _f = _f + 1
+                _daughter[i] = _father[_f]
+                _f = _f + 1       
+        
+
+    def create_childrens(self):
+        self._children_indices = np.empty(shape=(self.population_size, self.size_of_Q), dtype=int)
+        for i in range(self.population_size // 2):
+            _father_index = randint(0, self.population_size - 1)
+            _mother_index = randint(0, self.population_size - 1)
+            while _father_index == _mother_index:
+                _father_index = randint(0, self.population_size - 1)
+            _father = self._parents_indices[_father_index]
+            _mother = self._parents_indices[_mother_index]
+            self.crossover(_mother, _father, i)
+            self.mutate_children()
+    
+    def initialize_population_indexes(self): 
+        #if self._current_generation == 0:       
+        self._parents_indices = np.empty(shape=(self.population_size, self.size_of_Q), dtype=int)
+        for j in range(0, self.population_size):                
+            self._parents_indices[j] = np.arange(self.size_of_Q)
+            shuffle(self._parents_indices[j])
+        #else:
+        #    self.create_childrens()
+
+
+    def create_permutation(self, individual_indices, index,  shuffled_Q):
         with open(self._current_file, "w+") as iteration_file:
             for k in range(self.size_of_Q):
-                choose = randint(0, self.size_of_Q - 1)
+                #choose = randint(0, self.size_of_Q - 1)
+                choose = individual_indices[k]
+                #print(individual_indices)
+                #print(choose)
+                #return
                 buffer_runtimes = shuffled_Q["p"][choose]
                 buffer_nodes = shuffled_Q["q"][choose]
                 buffer_submit = shuffled_Q["r"][choose]
@@ -137,15 +209,16 @@ class Simulator:
                 shuffled_Q["p"][k] = buffer_runtimes
                 shuffled_Q["q"][k] = buffer_nodes
                 shuffled_Q["r"][k] = buffer_submit
-                buffer_index = self._permutation_indexes[index, choose]
-                self._permutation_indexes[index, choose] = self._permutation_indexes[index, k]
-                self._permutation_indexes[index, k] = buffer_index
+                #print(self._permutation_indices)
+                #buffer_index = self._permutation_indices[index, choose]
+                #self._permutation_indices[index, choose] = self._permutation_indices[index, k]
+                #self._permutation_indices[index, k] = buffer_index
 
             for j in range(self.size_of_S):
                 iteration_file.write(f"{self._jobs_S['p'][j]},{self._jobs_S['q'][j]},{self._jobs_S['r'][j]}\n")
             for k in range(self.size_of_Q):
                 iteration_file.write(
-                    f"{self._jobs_Q['p'][self._permutation_indexes[index, k]]},{self._jobs_Q['q'][self._permutation_indexes[index, k]]},{self._jobs_Q['r'][self._permutation_indexes[index, k]]}\n"
+                    f"{self._jobs_Q['p'][self._permutation_indices[index, k]]},{self._jobs_Q['q'][self._permutation_indices[index, k]]},{self._jobs_Q['r'][self._permutation_indices[index, k]]}\n"
                 )
 
         return shuffled_Q
@@ -159,43 +232,21 @@ class Simulator:
 
         return shuffled_Q
 
-    def schedule_trials(self):
+    def schedule_population(self):
         shuffled_Q = self.create_shuffled_Q()
 
-        for trial_index in range(self.number_of_trials):
-            shuffled_Q = self.create_permutation(trial_index, shuffled_Q)
+        if self._result_file.exists():
+                self._result_file.unlink()    
+
+        for index, individual in enumerate(self.population_indices):
+            shuffled_Q = self.create_permutation(individual, index , shuffled_Q)
+            #print(shuffled_Q)
+            #return            
             subprocess.run(
                 ["./trials_simulator", self.cluster, self.deployment],
                 stdout=open(self._result_file, "a+"),
                 cwd=SIMULATION_DIR,
             )
-
-    def compute_AVGbsld(self, index):
-        exp_sum_slowdowns = 0.0
-        distribution = np.zeros(self.size_of_Q)
-        exp_first_choice = np.zeros((self.number_of_trials), dtype=np.int32)
-        exp_slowdowns = np.zeros((self.number_of_trials))
-
-        for trialID in range(self.number_of_trials):
-            exp_first_choice[trialID] = self._permutation_indexes[trialID, 0]  # asserted
-
-        trialID = 0
-        with open(self._result_file, "r") as rf:
-            lines = rf.readlines()
-            if len(lines) != self.number_of_trials:
-                index = index - 1
-            for line in lines:
-                exp_slowdowns[trialID] = float(line)
-                exp_sum_slowdowns += float(line)
-                trialID = trialID + 1
-
-        for trialID in range(self.number_of_trials):
-            distribution[exp_first_choice[trialID]] += exp_slowdowns[trialID]
-
-        for k in range(self.size_of_Q):
-            distribution[k] = distribution[k] / exp_sum_slowdowns
-
-        return distribution
 
     def save_score_distribution(self, index, score_dist):
         output = ""
@@ -207,6 +258,21 @@ class Simulator:
         with open(self.get_training_data_file(index), "w+") as output_file:
             output_file.write(output)
 
+    def select(self):
+        with open(self._result_file, "r") as rf:
+            lines = rf.readlines()
+            arr_slowdowns = np.asarray([float(_str.rstrip("\n")) for _str in lines])
+            #print(arr_lines)
+            best_indvs = arr_slowdowns.argsort()[:self.population_size]
+            #print(best_indvs)
+            lst_next_indvs = []
+            for indv in best_indvs:
+                lst_next_indvs.append(self.population_indices[indv])
+            #print(lst_next_indvs)
+            self._parents_indices = np.asarray(lst_next_indvs)
+            print("Bounded Slowdown: ", arr_slowdowns[best_indvs[0]])
+            
+
     def simulate(self):
         for tuple_index in range(self.get_start_index(), self.number_of_tuples):
             self._jobs_S = {"p": [], "q": [], "r": []}
@@ -215,10 +281,24 @@ class Simulator:
             self.store_tuple(tuple_index)
             self.create_initial_state(tuple_index)
             self.clear_possible_artifacts(tuple_index)
-            self.initialize_permutation_indexes()
-            self.schedule_trials()
-            score_dist = self.compute_AVGbsld(tuple_index)
-            self.save_score_distribution(tuple_index, score_dist)
+            for gen in range(self.number_of_generations):
+                print("Generation: ", gen)
+                if gen == 0: 
+                    self.initialize_population_indexes()                    
+                    self.create_childrens()                    
+                else:
+                    self.create_childrens()                    
+                #print("Parents: ", self._parents_indices)
+                #print("Children: ", self._children_indices)
+                #self.population_indices = self._parents_indices + self._children_indices
+                self.population_indices = np.concatenate((self._parents_indices, self._children_indices))
+                self._permutation_indices = self.population_indices                  
+                #print(self.population_indices)
+                self.schedule_population()
+                self.select()
+            #    score_dist = self.compute_AVGbsld(tuple_index)
+                self._current_generation = gen
+            #self.save_score_distribution(tuple_index, score_dist)
 
     @classmethod
     def clear_files(cls):
@@ -247,11 +327,14 @@ if __name__ == "__main__":
         SIMULATION_PARAMETERS["application"],
         SIMULATION_PARAMETERS["platform"],
         SIMULATION_PARAMETERS["number-of-tuples"],
-        SIMULATION_PARAMETERS["number-of-trials"],
+        SIMULATION_PARAMETERS["population-size"],
+        SIMULATION_PARAMETERS["number-of-generations"],
+        SIMULATION_PARAMETERS["mutation-prob"],
         SIMULATION_PARAMETERS["size-of-S"],
         SIMULATION_PARAMETERS["size-of-Q"],
-        False,
+        True
     )
+   
 
     simulator.simulate()
     # simulator.clear_files()
