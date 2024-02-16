@@ -186,11 +186,67 @@ To increase the precision and the speed of the computation of the targets given 
 |     2 |     30 |   25 |              |
 |    .. |    ... |...   |              |
 |    10 |    250 | 2520 | nb_gen = 500 |
-*** :: find a way to use latin hypercube (agrparse)
+*** TODO :: find a way to use latin hypercube (agrparse)
 #+begin_example
 for j in range(0, self.population_size):
             self._parents_indices[j] = np.arange(self.size_of_Q)
             shuffle(self._parents_indices[j])
 #+end_example
-to replace if we use the option -lhs
+to replace if we use the option -lhs:
+#+begin_example
+def initialize_population_indexes(self):
+        #if self._current_generation == 0:
+        self._parents_indices = np.empty(shape=(self.population_size, self.size_of_Q), dtype=int)
+       #print(self._parents_indices[0])
+        if args.hypercube :
+            sampler= qmc.LatinHypercube(d=self.size_of_Q)
+            lhs=sampler.random(n=self.population_size)
+            for indiv in range (0,self.population_size):
+                prob = lhs[indiv]
+                copy=[]
+
+
+                for i in range ( 0,self.size_of_Q):
+
+                    idx=0
+                    p=random()
+
+                    while (np.isin(idx,self._parents_indices[indiv]) or p>prob[i]) and idx<self.size_of_Q :
+                        idx=idx+1
+                        p=random()
+                    #print(np.isin(idx,self._parents_indices[indiv]))
+                    self._parents_indices[indiv][i]=idx
+                    copy.append(idx)
+                    #print(copy.count(idx))
+            print(self._parents_indices.shape)
+
+
+        else:
+
+            for j in range(0, self.population_size):
+                self._parents_indices[j] = np.arange(self.size_of_Q)
+                shuffle(self._parents_indices[j])
+
+
+        #else:
+        #    self.create_childrens()
+
+
+#+end_example
+*** TODO :: Error triggered :
+#+begin_example
+Generation:  0
+(40, 32)
+Traceback (most recent call last):
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 396, in <module>
+    simulator.simulate()
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 340, in simulate
+    self.create_childrens()
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 191, in create_childrens
+    self.crossover(_mother, _father, i)
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 171, in crossover
+    while _mother[_m] in _son_heritage_father:
+IndexError: index 32 is out of bounds for axis 0 with size 32
+
+#+end_example
 ** Take a look about jupyter notebook which compute the VIF
