@@ -155,17 +155,26 @@ To increase the precision and the speed of the computation of the targets given 
 **** DONE :: read the paper on the genetic algorithm (https://webmail.etu.univ-grenoble-alpes.fr/service/home/~/?auth=co&loc=fr&id=29065&part=2)
 + GA approche to solve RCPSP
 **** DONE :: fork the branch https://github.com/fredgrub/scheduling-simulator/tree/dcsantos/genetic_algorithm_dataset_creation into my repositoty
-**** TODO :: Implement the method save_score_distribution
-***** TODO :: Compute the score of each jobs in the permutation find at the end of genetic algo by the method (rankof the jobs)/(number total of jobs in Q)
-***** TODO :: Write the score associate to each jobs on the trainnig data file
+**** DONE :: Implement the method save_score_distribution
+***** DONE :: Compute the score of each jobs in the permutation find at the end of genetic algo by the method (rankof the jobs)/(number total of jobs in Q)
+***** DONE :: Write the score associate to each jobs on the trainnig data file
 **** DONE :: Find a way to define a stop criterion for the number of iteration of the genetic algorithm
 * mercredi 14 février
 ** Preparation magisterial presentation
-*** TODO :: The online job scheduling problem can be defined as an NP complete problem?
-*** TODO :: Which option is better between talk more about simgrid or talk more about our implementation of the scheduling simulator?
-*** TODO :: In the multiple linear regression model the family of functions represent in our case the set of function Lin, Qdr, Cub, Qua ...? And at the end we choose the one which have the best performance?
-*** TODO :: Do we loose in explainabilty by using polynomiale features?
-*** TODO :: In our simulation how many cores do we have?
-*** TODO :: Do we use the same data in trainnig of the models and in the tester.c implementation?
-*** TODO :: Data used come from real HPC plateform trace?
-*** TODO :: How to define the average bounded slowdown with simple terms ?
+*** DONE :: The online job scheduling problem can be defined as an NP complete problem?
+*** DONE :: Which option is better between talk more about simgrid or talk more about our implementation of the scheduling simulator?
+*** DONE :: In the multiple linear regression model the family of functions represent in our case the set of function Lin, Qdr, Cub, Qua ...? And at the end we choose the one which have the best performance?
+*** DONE :: Do we loose in explainabilty by using polynomiale features?
+*** DONE :: In our simulation how many cores do we have?
+*** DONE :: Do we use the same data in trainnig of the models and in the tester.c implementation?
+*** DONE :: Data used come from real HPC plateform trace?
+*** DONE :: How to define the average bounded slowdown with simple terms ?
+* Vendredi 16 février
+** Advecement on the Gen algo implementation
+*** TODO :: Concatenate the dataset genrerated by the algo to construct our train dataset
++ Adding in simulator the attribute : _global_training_data_path = SIMULATION_DIR / "training-data"/ "global_training_data.csv"
++ Adding in simulator the attribute : self.global_data=open(self._global_training_data_path,"w+")
++ Adding in regressor the global variable : TRAINING_DIR = pathlib.Path(__file__).parent.parent / "simulator" / "training-data"
+  + using it : SCORE_DISTRIBUTION = TRAINING_DIR / "global_training_data.csv"
+*** TODO :: Define a way to stop the learning of the gen algo
+** Take a look about jupyter notebook which compute the VIF
