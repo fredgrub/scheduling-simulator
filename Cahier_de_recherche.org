@@ -34,21 +34,21 @@
 **** Simulator attributes
 + _jobs_S : the initial state of the simulated HPC before scheduling
 + _jobs_Q : the set of jobs to be schedule
-***** TODO :: Verifier les autres attributs avec Danilo si possible
+***** DONE :: Verifier les autres attributs avec Danilo si possible
 **** Simulator constructor
 + workload : workload model used to define the simulator
-***** TODO :: Understand what does mean the arguments deployment, cluster and fixed_seed
+***** DONE :: Understand what does mean the arguments deployment, cluster and fixed_seed
 **** Simulator Methods
 ***** get_workload_info(self)
 initialize the number of jobs and processors by reading the workload given to the constructor
-****** TODO :: What does mean model_jobs?
+****** DONE :: What does mean model_jobs?
 ***** store_tuple(self, index)
 store in _jobs_S and _jobs_Q jobs stored in model_jobs as it said in the paper with M, to apply this we used get_random_index() to define the begining of the set M.
 + Remark : _jobs_S and _jobs_Q -> ["p"]["q"]["r"]
 + Remark : nodes = processors
 ***** create_permutation (self, index, shuffled_Q)
 As it's explain on the paper, we compute |Q| permutation of the set Q to construct multple branch of simulation.
-****** TODO :: What does mean a branch of simulation?
+****** DONE :: What does mean a branch of simulation?
 ***** schedule_trials(self)
 Create a a new permutation for each trial
 ***** compute_AVGbsld(self,index)
@@ -93,7 +93,7 @@ apply the regression with all the functions contain by the object Regressor and 
 + 4 : Compute the scheduling experiment of Q for each policy in the parameter policies by the using of the method subprocess.run
 + 5 : write all the slowdowns computed during the experiment in a csv file
 ** Problem
-*** TODO :: Simulation
+*** DONE :: Simulation
 When I want to launch the simulation by the command python tester.py the simulation didn't occurs and reapeat the same line  : [1295866.000000] [ker_engine/INFO] 2836 actors are still running, waiting for something.
 + Jean Francois said to me :
   + the simulation must start at 0 but in our case the simulation start at 1295866 so it's strange, the cause can be an error in  the end of the simulation. May be the problem can occurs durring the cloture of the simulation.
@@ -131,7 +131,7 @@ Use simgrid_update_xml to update your file automatically to get rid of this warn
 Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
 [0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
 #+end_example
-**** TODO :: Use nix (ask Dorian)
+**** DONE :: Use nix (ask Dorian)
 **** DONE :: Find the computation of VIF
 + In the method _fit_function(self,function) regressor.py line 77 by the call :
     scipy.optimize.curve_fit(
@@ -141,4 +141,31 @@ Use simgrid_update_xml to update your file automatically to get rid of this warn
             sigma=self._compute_weights(),
             absolute_sigma=True,
         )
-***** TODO :: reading curve_fit documentation : https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
+***** DONE :: reading curve_fit documentation : https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
+* vendredi 9 février
+** Meeting with Danilo
+*** Sucessing to run the simulation
+Danilo send to me the file simgrid.nix which allow me to configure my nix-env withe the right version of simgrid by the command
+#+begin_example
+nix-shell simgrid.nix
+#+end_example
+Now I don't need to run initialize.py, i only need to call make in the directories src/tester and src/simulator
+*** Genetique algorithm
+To increase the precision and the speed of the computation of the targets given to the regressor for his learning, Danilo have implement a genetic algorithm which compute the best permutation of the set of jobs Q, the metric used to compare the permutation during the genetic algo is the AVGBoundedSlowdown.
+**** DONE :: read the paper on the genetic algorithm (https://webmail.etu.univ-grenoble-alpes.fr/service/home/~/?auth=co&loc=fr&id=29065&part=2)
++ GA approche to solve RCPSP
+**** DONE :: fork the branch https://github.com/fredgrub/scheduling-simulator/tree/dcsantos/genetic_algorithm_dataset_creation into my repositoty
+**** TODO :: Implement the method save_score_distribution
+***** TODO :: Compute the score of each jobs in the permutation find at the end of genetic algo by the method (rankof the jobs)/(number total of jobs in Q)
+***** TODO :: Write the score associate to each jobs on the trainnig data file
+**** DONE :: Find a way to define a stop criterion for the number of iteration of the genetic algorithm
+* mercredi 14 février
+** Preparation magisterial presentation
+*** TODO :: The online job scheduling problem can be defined as an NP complete problem?
+*** TODO :: Which option is better between talk more about simgrid or talk more about our implementation of the scheduling simulator?
+*** TODO :: In the multiple linear regression model the family of functions represent in our case the set of function Lin, Qdr, Cub, Qua ...? And at the end we choose the one which have the best performance?
+*** TODO :: Do we loose in explainabilty by using polynomiale features?
+*** TODO :: In our simulation how many cores do we have?
+*** TODO :: Do we use the same data in trainnig of the models and in the tester.c implementation?
+*** TODO :: Data used come from real HPC plateform trace?
+*** TODO :: How to define the average bounded slowdown with simple terms ?

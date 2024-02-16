@@ -18,10 +18,10 @@ SIMULATION_PARAMETERS = {
     "workload": str(DATA_DIR / "workloads" / "lublin_256.swf"),
     "application": str(DATA_DIR / "applications" / "deployment_cluster.xml"),
     "platform": str(DATA_DIR / "platforms" / "simple_cluster.xml"),
-    "number-of-tuples": 1,
+    "number-of-tuples": 2,
     "population-size": 40,
     "mutation-prob": 0.05,
-    "number-of-generations": 500,
+    "number-of-generations": 10,
     "size-of-S": 16,
     "size-of-Q": 32,
 }
@@ -272,7 +272,21 @@ class Simulator:
             self._parents_indices = np.asarray(lst_next_indvs)
             print("Bounded Slowdown: ", arr_slowdowns[best_indvs[0]])
             
-
+    def define_score_dist(self):
+        with open(self._result_file, "r") as rf:
+            lines = rf.readlines()
+            arr_slowdowns = np.asarray([float(_str.rstrip("\n")) for _str in lines])
+            #print(arr_lines)
+            best_indiv_idx = arr_slowdowns.argsort()[0]
+            best_indiv=self.population_indices[best_indiv_idx]
+            target_score=[0]*self.size_of_Q
+            cpt=1
+            for idx in best_indiv:
+                target_score[idx]=cpt/self.size_of_Q
+                cpt=cpt+1
+            print(target_score)
+            return target_score
+    
     def simulate(self):
         for tuple_index in range(self.get_start_index(), self.number_of_tuples):
             self._jobs_S = {"p": [], "q": [], "r": []}
@@ -298,7 +312,9 @@ class Simulator:
                 self.select()
             #    score_dist = self.compute_AVGbsld(tuple_index)
                 self._current_generation = gen
-            #self.save_score_distribution(tuple_index, score_dist)
+            score_dist=self.define_score_dist()
+            self.save_score_distribution(tuple_index, score_dist)
+            
 
     @classmethod
     def clear_files(cls):
