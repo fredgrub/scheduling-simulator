@@ -177,4 +177,20 @@ To increase the precision and the speed of the computation of the targets given 
 + Adding in regressor the global variable : TRAINING_DIR = pathlib.Path(__file__).parent.parent / "simulator" / "training-data"
   + using it : SCORE_DISTRIBUTION = TRAINING_DIR / "global_training_data.csv"
 *** TODO :: Define a way to stop the learning of the gen algo
+** posible utilisation d'une recherche profonde -> Gen algo
+** latin hypercube for the initialization of the population
+** Grid Search algo hyper parameter = nb gen , initiaalisation de la population
+** Jeu experimentale python simulator.py -random/-lhs
+| tuple | random |  lhs |              |
+|     1 |    512 |  450 |              |
+|     2 |     30 |   25 |              |
+|    .. |    ... |...   |              |
+|    10 |    250 | 2520 | nb_gen = 500 |
+*** :: find a way to use latin hypercube (agrparse)
+#+begin_example
+for j in range(0, self.population_size):
+            self._parents_indices[j] = np.arange(self.size_of_Q)
+            shuffle(self._parents_indices[j])
+#+end_example
+to replace if we use the option -lhs
 ** Take a look about jupyter notebook which compute the VIF
