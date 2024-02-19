@@ -233,7 +233,7 @@ def initialize_population_indexes(self):
 
 
 #+end_example
-*** TODO :: Error triggered :
+*** DONE :: Error triggered : Problem solved, due to multiple time the same value in all the individual of the population
 #+begin_example
 Generation:  0
 (40, 32)

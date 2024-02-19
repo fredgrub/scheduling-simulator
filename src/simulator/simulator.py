@@ -4,7 +4,10 @@ import pathlib
 import numpy as np
 import shutil
 import subprocess
+from scipy.stats import qmc
+import argparse
 from random import seed, randint, shuffle, random
+
 
 # Add the src directory to the path so we can import the tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src")))
@@ -18,13 +21,16 @@ SIMULATION_PARAMETERS = {
     "workload": str(DATA_DIR / "workloads" / "lublin_256.swf"),
     "application": str(DATA_DIR / "applications" / "deployment_cluster.xml"),
     "platform": str(DATA_DIR / "platforms" / "simple_cluster.xml"),
-    "number-of-tuples": 2,
+    "number-of-tuples": 1,
     "population-size": 40,
     "mutation-prob": 0.05,
-    "number-of-generations": 10,
+    "number-of-generations": 5,
     "size-of-S": 16,
     "size-of-Q": 32,
 }
+parser=argparse.ArgumentParser()
+parser.add_argument("-l","--hypercube",help="random (default) or hypercube?",action="store_true")
+args = parser.parse_args()
 
 
 class Simulator:
@@ -36,6 +42,8 @@ class Simulator:
     _task_sets_path = SIMULATION_DIR / "task-sets"
     _states_path = SIMULATION_DIR / "states"
     _training_data_path = SIMULATION_DIR / "training-data"
+    _global_training_data_path = SIMULATION_DIR / "training-data" / "global_training_data.csv"
+    _global_training_data_path = SIMULATION_DIR / "training-data" / "global_training_data.csv"
     _permutation_indices = None
     _parents_indices = None
     _children_indices = None
@@ -61,6 +69,7 @@ class Simulator:
         self.number_of_processors = None
         self.model_jobs = None
         self.get_workload_info()
+        self.global_data=open(self._global_training_data_path,"w+")
 
         if fixed_seed:
             seed(42)
@@ -183,11 +192,41 @@ class Simulator:
             self.mutate_children()
     
     def initialize_population_indexes(self): 
-        #if self._current_generation == 0:       
+        #if self._current_generation == 0:  
         self._parents_indices = np.empty(shape=(self.population_size, self.size_of_Q), dtype=int)
-        for j in range(0, self.population_size):                
-            self._parents_indices[j] = np.arange(self.size_of_Q)
-            shuffle(self._parents_indices[j])
+       #print(self._parents_indices[0])
+        if args.hypercube :
+            sampler= qmc.LatinHypercube(d=self.size_of_Q)
+            lhs=sampler.random(n=self.population_size)
+            for indiv in range (0,self.population_size):
+                prob = lhs[indiv]
+                copy=[]
+            
+                
+                for i in range ( 0,self.size_of_Q):
+                    
+                    idx=randint(0, self.size_of_Q - 1)
+                    p=random()
+                    
+                    while (np.isin(idx,self._parents_indices[indiv]) or p>prob[i]) :
+                        idx=randint(0, self.size_of_Q - 1)
+                        p=random()
+                    #print(np.isin(idx,self._parents_indices[indiv]))
+                    self._parents_indices[indiv][i]=idx
+                    copy.append(idx)
+                    #print(copy.count(idx))
+                print(self._parents_indices[indiv])
+
+
+        else:     
+            
+            for j in range(0, self.population_size):                
+                self._parents_indices[j] = np.arange(self.size_of_Q)
+                
+                shuffle(self._parents_indices[j])
+                print(self._parents_indices[j])
+            
+        
         #else:
         #    self.create_childrens()
 
@@ -257,6 +296,7 @@ class Simulator:
 
         with open(self.get_training_data_file(index), "w+") as output_file:
             output_file.write(output)
+        self.global_data.write(output)
 
     def select(self):
         with open(self._result_file, "r") as rf:
@@ -338,6 +378,8 @@ class Simulator:
 
 
 if __name__ == "__main__":
+    if args.hypercube:
+        print("cc")
     simulator = Simulator(
         SIMULATION_PARAMETERS["workload"],
         SIMULATION_PARAMETERS["application"],
@@ -350,7 +392,8 @@ if __name__ == "__main__":
         SIMULATION_PARAMETERS["size-of-Q"],
         True
     )
-   
+    
+
 
     simulator.simulate()
     # simulator.clear_files()
