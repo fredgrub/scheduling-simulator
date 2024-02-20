@@ -1,0 +1,252 @@
+#+title: Cahier De Recherche
+#+ Author: Djoser SIMEU
+
+* mercredi 31 janvier 2024
+** Prise en mains du repertoire gitHub
++ Fork du repertoire https://github.com/fredgrub/scheduling-simulator
++ Prise main de Docker
+*** TODO :: Mettre à jour la version de python 3.9.12  -> 3.9.2
+*** TODO :: Mieux comprendre l'utilisation de conteneurs docker
+** Erreurs rencontrée :
++ You may still be able to access the file from the browser:https://drive.google.com/uc?id=1MkSKglrQeI8rEO9hbr-7kYEvSHhrpFKG but Gdown can't. Please check connections and permissions.
+  + commande : sudo docker run --rm -v "$(pwd)":/workspaces/scheduling-simulator/ build-simgrid bash -c "python /workspaces/scheduling-simulator/initialize.py"
++ après l'éxécution de la commande : nohup python src/simulator/simulator.py & , le dossier data censé contenir les données de la simulation est vide.
+  + donc la commande python /src/regressor/regressor.py échoue.
+**** DONE :: regler l'erreur et comprendre la synthax de docker run
+
+
+
+* vendredi 2 février
+** Code modification
++ line 388 : src/simulator/trial_simulator.c -> commentary (todo[i]->name problem)
++ line 677 : src/tester/sched-simulator-runtime.c ->commentary (todo[i]->name problem)
++ line 624 : src/tester/sched-simulator-backfilling.c -> commentary (todo[i]->name problem)
+*** TODO :: Understand why the todo[i]->name problem occur
+** Files understanding
+*** simulator.py
++ S = initial state of the HPC
++ Q = sets of jobs to be schedule into the HPC
++ SIMULATION_PARAMETERS :
+  + number_of_tuples : number of binome S-Q
+  + number_of_trials : number of time we schedule the jobs in Q
+  + size_of_S : number of jobs in S
+  + size_of_Q : number of jobs in Q
+**** Simulator attributes
++ _jobs_S : the initial state of the simulated HPC before scheduling
++ _jobs_Q : the set of jobs to be schedule
+***** DONE :: Verifier les autres attributs avec Danilo si possible
+**** Simulator constructor
++ workload : workload model used to define the simulator
+***** DONE :: Understand what does mean the arguments deployment, cluster and fixed_seed
+**** Simulator Methods
+***** get_workload_info(self)
+initialize the number of jobs and processors by reading the workload given to the constructor
+****** DONE :: What does mean model_jobs?
+***** store_tuple(self, index)
+store in _jobs_S and _jobs_Q jobs stored in model_jobs as it said in the paper with M, to apply this we used get_random_index() to define the begining of the set M.
++ Remark : _jobs_S and _jobs_Q -> ["p"]["q"]["r"]
++ Remark : nodes = processors
+***** create_permutation (self, index, shuffled_Q)
+As it's explain on the paper, we compute |Q| permutation of the set Q to construct multple branch of simulation.
+****** DONE :: What does mean a branch of simulation?
+***** schedule_trials(self)
+Create a a new permutation for each trial
+***** compute_AVGbsld(self,index)
+Apply the computation of the score(j) based on the equation 3 of the paper
+****** TODO :: more Understand the function
+***** simulate(self)
+call all the functions described previously to compute the simulation.
+*** regressor.py
+**** Regressor Attributes
++ functions : list of functions used for the multiple linear regression
++ data_set : dataset on which we compute the regression
+**** Regressor Methods
+***** _compute_weights(self)
+compute the weights for the regression by computing 1/(p*q) for all the enteries of the dataset
+***** _fit_function(self,function)
+Fit the function given as parameter to the dataset by using scipy.optimize.curve_fit
+****** TODO :: Understand what does curve_fit
+***** _predict_y(self, function, optimal_parameters)
+Applying the function given as parameter to the dataset and return the result in an array
+***** _compute_mae(self, predicted_y)
+compute the mean absolute error of the prediction with the attribute score of the dataset
+***** regression(self, output_file, include_covariance=False)
+apply the regression with all the functions contain by the object Regressor and write the result into a file
+* mercredi 7 février
+** File understanding
+*** tester.py
+**** workload_experiments(workloads, policies, sim_type)
+***** Parameters
++ parameter workloads : an array of string which represent in which represent the workloads used to based our simulation
+  + possible values :  ["CTC-SP2", "SDSC-BLUE", "LUBLIN 256"]
++ parameter policies : array of string which represent the policies used to schedule the jobs in Q in our experiments
+  + possible values : ["FCFS", "WFP3", "UNICEF", "SPT", "SAF", "F2", "LIN", "QDR", "CUB", "QUA", "QUI", "SEX"]
++ parameter sim_type : an array of string which represent the type of simulator we want to use in our simulation
+  + possible values : ["ACTUAL", "ESTIMATED"]
+****** TODO :: knowing the role of each workload and the particularity of each simulation type
+***** Function
++ incomprehension line 98-99 tester.py
++ 1 : strat by collecting informations about the workloads and the type of simulator used
++ 2 : defining a dataframe slowdown where to store all slowdowns from all experiments
++ 3.1 : Defining S and Q from the choosen workload as it's done in simulator.py
++ 3.2 : In the case where the type of simulator used is not "ACTUAL" we must additionally used the attribute ~p which represent the estimated job's processing time
++ 4 : Compute the scheduling experiment of Q for each policy in the parameter policies by the using of the method subprocess.run
++ 5 : write all the slowdowns computed during the experiment in a csv file
+** Problem
+*** DONE :: Simulation
+When I want to launch the simulation by the command python tester.py the simulation didn't occurs and reapeat the same line  : [1295866.000000] [ker_engine/INFO] 2836 actors are still running, waiting for something.
++ Jean Francois said to me :
+  + the simulation must start at 0 but in our case the simulation start at 1295866 so it's strange, the cause can be an error in  the end of the simulation. May be the problem can occurs durring the cloture of the simulation.
++ head of err.log :
+#+begin_example
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[1295866.000000] ./src/kernel/EngineImpl.cpp:851: [ker_engine/CRITICAL] Oops! Deadlock or code not perfectly clean.
+[1295866.000000] [ker_engine/INFO] 2836 actors are still running, waiting for something.
+[1295866.000000] [ker_engine/INFO] Legend of the following listing: "Actor <pid> (<name>@<host>): <status>"
+[1295866.000000] [ker_engine/INFO] Actor 1 (master@node-0) simcall Simcall::RUN_BLOCKING
+#+end_example
++ nothing in out.log
+
+**** part of the problem solved
+un-commentation of the line commented 02/02/2024 but replacing todo[i]->name by todo[i]
++ out.log :
+Performing scheduling performance test for the workload trace CTC-SP2.
+Configuration: ACTUAL
+Performing scheduling experiment 1. Number of tasks=2835
++ head err.log :
+#+begin_example
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/platforms/plat_day.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+
+Use simgrid_update_xml to update your file automatically to get rid of this warning. This program is installed automatically with SimGrid, or available in the tools/ directory of the source archive.
+[0.000000] [surf_parse/INFO] You're using a v4.0 XML file (/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/data/applications/deployment_ctcsp2.xml) while the current standard is v4.1 That's fine, the new version is backward compatible.
+#+end_example
+**** DONE :: Use nix (ask Dorian)
+**** DONE :: Find the computation of VIF
++ In the method _fit_function(self,function) regressor.py line 77 by the call :
+    scipy.optimize.curve_fit(
+            function,
+            (self.data_set["p"], self.data_set["q"], self.data_set["r"]),
+            self.data_set["score"],
+            sigma=self._compute_weights(),
+            absolute_sigma=True,
+        )
+***** DONE :: reading curve_fit documentation : https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
+* vendredi 9 février
+** Meeting with Danilo
+*** Sucessing to run the simulation
+Danilo send to me the file simgrid.nix which allow me to configure my nix-env withe the right version of simgrid by the command
+#+begin_example
+nix-shell simgrid.nix
+#+end_example
+Now I don't need to run initialize.py, i only need to call make in the directories src/tester and src/simulator
+*** Genetique algorithm
+To increase the precision and the speed of the computation of the targets given to the regressor for his learning, Danilo have implement a genetic algorithm which compute the best permutation of the set of jobs Q, the metric used to compare the permutation during the genetic algo is the AVGBoundedSlowdown.
+**** DONE :: read the paper on the genetic algorithm (https://webmail.etu.univ-grenoble-alpes.fr/service/home/~/?auth=co&loc=fr&id=29065&part=2)
++ GA approche to solve RCPSP
+**** DONE :: fork the branch https://github.com/fredgrub/scheduling-simulator/tree/dcsantos/genetic_algorithm_dataset_creation into my repositoty
+**** DONE :: Implement the method save_score_distribution
+***** DONE :: Compute the score of each jobs in the permutation find at the end of genetic algo by the method (rankof the jobs)/(number total of jobs in Q)
+***** DONE :: Write the score associate to each jobs on the trainnig data file
+**** DONE :: Find a way to define a stop criterion for the number of iteration of the genetic algorithm
+* mercredi 14 février
+** Preparation magisterial presentation
+*** DONE :: The online job scheduling problem can be defined as an NP complete problem?
+*** DONE :: Which option is better between talk more about simgrid or talk more about our implementation of the scheduling simulator?
+*** DONE :: In the multiple linear regression model the family of functions represent in our case the set of function Lin, Qdr, Cub, Qua ...? And at the end we choose the one which have the best performance?
+*** DONE :: Do we loose in explainabilty by using polynomiale features?
+*** DONE :: In our simulation how many cores do we have?
+*** DONE :: Do we use the same data in trainnig of the models and in the tester.c implementation?
+*** DONE :: Data used come from real HPC plateform trace?
+*** DONE :: How to define the average bounded slowdown with simple terms ?
+* Vendredi 16 février
+** Advecement on the Gen algo implementation
+*** TODO :: Concatenate the dataset genrerated by the algo to construct our train dataset
++ Adding in simulator the attribute : _global_training_data_path = SIMULATION_DIR / "training-data"/ "global_training_data.csv"
++ Adding in simulator the attribute : self.global_data=open(self._global_training_data_path,"w+")
++ Adding in regressor the global variable : TRAINING_DIR = pathlib.Path(__file__).parent.parent / "simulator" / "training-data"
+  + using it : SCORE_DISTRIBUTION = TRAINING_DIR / "global_training_data.csv"
+*** TODO :: Define a way to stop the learning of the gen algo
+** posible utilisation d'une recherche profonde -> Gen algo
+** latin hypercube for the initialization of the population
+** Grid Search algo hyper parameter = nb gen , initiaalisation de la population
+** Jeu experimentale python simulator.py -random/-lhs
+| tuple | random |  lhs |              |
+|     1 |    512 |  450 |              |
+|     2 |     30 |   25 |              |
+|    .. |    ... |...   |              |
+|    10 |    250 | 2520 | nb_gen = 500 |
+*** TODO :: find a way to use latin hypercube (agrparse)
+#+begin_example
+for j in range(0, self.population_size):
+            self._parents_indices[j] = np.arange(self.size_of_Q)
+            shuffle(self._parents_indices[j])
+#+end_example
+to replace if we use the option -lhs:
+#+begin_example
+def initialize_population_indexes(self):
+        #if self._current_generation == 0:
+        self._parents_indices = np.empty(shape=(self.population_size, self.size_of_Q), dtype=int)
+       #print(self._parents_indices[0])
+        if args.hypercube :
+            sampler= qmc.LatinHypercube(d=self.size_of_Q)
+            lhs=sampler.random(n=self.population_size)
+            for indiv in range (0,self.population_size):
+                prob = lhs[indiv]
+                copy=[]
+
+
+                for i in range ( 0,self.size_of_Q):
+
+                    idx=0
+                    p=random()
+
+                    while (np.isin(idx,self._parents_indices[indiv]) or p>prob[i]) and idx<self.size_of_Q :
+                        idx=idx+1
+                        p=random()
+                    #print(np.isin(idx,self._parents_indices[indiv]))
+                    self._parents_indices[indiv][i]=idx
+                    copy.append(idx)
+                    #print(copy.count(idx))
+            print(self._parents_indices.shape)
+
+
+        else:
+
+            for j in range(0, self.population_size):
+                self._parents_indices[j] = np.arange(self.size_of_Q)
+                shuffle(self._parents_indices[j])
+
+
+        #else:
+        #    self.create_childrens()
+
+
+#+end_example
+*** DONE :: Error triggered : Problem solved, due to multiple time the same value in all the individual of the population
+#+begin_example
+Generation:  0
+(40, 32)
+Traceback (most recent call last):
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 396, in <module>
+    simulator.simulate()
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 340, in simulate
+    self.create_childrens()
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 191, in create_childrens
+    self.crossover(_mother, _father, i)
+  File "/home/djosersimeu/documents/m1_mosig/internship/workspaces/scheduling-simulator/src/simulator/simulator.py", line 171, in crossover
+    while _mother[_m] in _son_heritage_father:
+IndexError: index 32 is out of bounds for axis 0 with size 32
+
+#+end_example
+** Take a look about jupyter notebook which compute the VIF
